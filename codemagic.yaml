@@ -1,0 +1,47 @@
+workflows:
+  creances-android:
+    name: Creances - APK Android
+    instance_type: linux_x2
+    max_build_duration: 90
+    environment:
+      node: 22
+      java: 17
+      android_signing:
+        - creances_release
+      vars:
+        EXPO_PUBLIC_DOMAIN: architecture-mentor.replit.app
+        EXPO_NO_TELEMETRY: "1"
+        CI: "1"
+    scripts:
+      - name: Installer les dependances
+        script: |
+          set -euo pipefail
+          cd "$CM_BUILD_DIR"
+          npm install --global pnpm@10.26.1
+          pnpm install --frozen-lockfile
+      - name: Preparer Android
+        script: |
+          set -euo pipefail
+          cd "$CM_BUILD_DIR"
+          pnpm --filter @workspace/creances-mobile exec expo prebuild --platform android --no-install
+          node scripts/configure-release-signing.mjs
+      - name: Compiler et verifier APK
+        script: |
+          set -euo pipefail
+          set +x
+          export ANDROID_KEYSTORE_PATH="${CM_KEYSTORE_PATH:?Signature manquante}"
+          export ANDROID_KEYSTORE_PASSWORD="${CM_KEYSTORE_PASSWORD:?Mot de passe manquant}"
+          export ANDROID_KEY_ALIAS="${CM_KEY_ALIAS:?Alias manquant}"
+          export ANDROID_KEY_PASSWORD="${CM_KEY_PASSWORD:?Mot de passe cle manquant}"
+          cd "$CM_BUILD_DIR/artifacts/creances-mobile/android"
+          SDK="${ANDROID_SDK_ROOT:-${ANDROID_HOME:?SDK Android manquant}}"
+          printf 'sdk.dir=%s\n' "$SDK" > local.properties
+          chmod +x gradlew
+          ./gradlew :app:assembleRelease --no-daemon --console=plain
+          APK=app/build/outputs/apk/release/app-release.apk
+          APKSIGNER="$(find "$SDK/build-tools" -name apksigner -type f | sort -V | tail -1)"
+          test -n "$APKSIGNER"
+          "$APKSIGNER" verify "$APK"
+          unzip -l "$APK" | grep 'assets/index.android.bundle'
+    artifacts:
+      - artifacts/creances-mobile/android/app/build/outputs/apk/release/app-release.apk

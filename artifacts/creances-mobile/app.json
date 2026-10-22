@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "Créances · Android",
+    "slug": "creances-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/creances-icon.png",
+    "scheme": "creances-mobile",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "ch.creances.mobile",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/creances-icon.png",
+        "backgroundColor": "#060a07"
+      },
+      "softwareKeyboardLayoutMode": "resize"
+    },
+    "web": {
+      "favicon": "./assets/images/creances-icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/creances-icon.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
+          "backgroundColor": "#060a07"
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "sounds": [
+            "./assets/sounds/collection.wav"
+          ],
+          "color": "#0aff4f"
+        }
+      ],
+      ["expo-audio", {
+        "microphonePermission": false,
+        "recordAudioAndroid": false,
+        "enableBackgroundPlayback": false
+      }]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "backgroundColor": "#060a07"
+  }
+}
