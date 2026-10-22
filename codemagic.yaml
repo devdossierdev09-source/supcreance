@@ -17,13 +17,12 @@ workflows:
         script: |
           set -euo pipefail
           cd "$CM_BUILD_DIR"
-          npm install --global pnpm@10.26.1
-          pnpm install --frozen-lockfile
+                    npx --yes --package=pnpm@10.26.1 pnpm install --frozen-lockfile
       - name: Preparer Android
         script: |
           set -euo pipefail
           cd "$CM_BUILD_DIR"
-          pnpm --filter @workspace/creances-mobile exec expo prebuild --platform android --no-install
+                    npx --yes --package=pnpm@10.26.1 pnpm --filter @workspace/creances-mobile exec expo prebuild --platform android --no-install
           node scripts/configure-release-signing.mjs
       - name: Compiler et verifier APK
         script: |
